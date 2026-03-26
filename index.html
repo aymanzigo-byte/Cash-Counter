@@ -6,7 +6,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#0a0a0a">
-    <link rel="manifest" href="manifest.json">
     <title>تجميع فئات مصرية</title>
     <style>
         :root { --gold: #ffd700; --bg: #0a0a0a; --card: #161616; --text: #ffffff; --danger: #ff4b2b; }
@@ -17,51 +16,25 @@
             padding: 10px; display: flex; flex-direction: column; 
             align-items: center; height: 100vh; overflow: hidden; user-select: none;
         }
-        
-        header { width: 100%; max-width: 380px; display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid #222; margin-bottom: 5px; }
-        h2 { color: var(--gold); font-size: 1.1rem; letter-spacing: 1px; }
-        .settings-btn { background: none; border: none; color: var(--gold); font-size: 1.5rem; cursor: pointer; padding: 5px; }
-
-        .container { width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 4px; flex: 1; justify-content: center; }
-        
+        header { width: 100%; max-width: 380px; display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #222; }
+        h2 { color: var(--gold); font-size: 1.1rem; }
+        .settings-btn { background: none; border: none; color: var(--gold); font-size: 1.5rem; cursor: pointer; }
+        .container { width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 5px; flex: 1; justify-content: center; margin: 10px 0; }
         .cash-row { 
             background: var(--card); border: 1px solid #2a2a2a; border-radius: 10px; 
-            padding: 8px 12px; display: flex; justify-content: space-between; 
-            align-items: center; cursor: pointer;
+            padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer;
         }
-        .cash-row:active { background: #222; transform: scale(0.98); }
-        .label-group { display: flex; align-items: center; gap: 10px; }
-        .feya-btn { 
-            background: var(--gold); color: #000; font-weight: bold; width: 38px; height: 38px; 
-            border-radius: 8px; display: flex; justify-content: center; align-items: center; 
-            font-size: 0.9rem;
-        }
-        .count-text { color: #888; font-size: 0.7rem; }
-        .sum-text { color: var(--gold); font-size: 1rem; font-weight: bold; font-family: monospace; }
-        
-        .clear-btn {
-            background: none; border: 1px solid var(--danger); color: var(--danger);
-            padding: 6px 20px; border-radius: 8px; cursor: pointer;
-            margin: 8px 0; font-weight: bold; font-size: 0.8rem; transition: 0.2s;
-        }
-        .clear-btn:active { background: var(--danger); color: #fff; }
-
-        .total-footer { 
-            background: linear-gradient(135deg, #1a1a1a 0%, #000 100%); 
-            border: 1px solid var(--gold); border-radius: 12px; padding: 15px; 
-            width: 100%; max-width: 380px; display: flex; justify-content: space-between; 
-            align-items: center; margin-bottom: 5px;
-        }
-        .total-value { font-size: 1.4rem; color: var(--gold); font-weight: bold; font-family: monospace; }
-
-        /* المودال */
+        .feya-btn { background: var(--gold); color: #000; font-weight: bold; width: 40px; height: 40px; border-radius: 8px; display: flex; justify-content: center; align-items: center; }
+        .count-text { color: #888; font-size: 0.75rem; margin-right: 10px; }
+        .sum-text { color: var(--gold); font-size: 1.1rem; font-weight: bold; font-family: monospace; }
+        .clear-btn { background: none; border: 1px solid var(--danger); color: var(--danger); padding: 8px 25px; border-radius: 8px; cursor: pointer; margin-bottom: 10px; font-weight: bold; }
+        .total-footer { background: linear-gradient(135deg, #1a1a1a 0%, #000 100%); border: 1px solid var(--gold); border-radius: 12px; padding: 15px; width: 100%; max-width: 380px; display: flex; justify-content: space-between; align-items: center; }
+        .total-value { font-size: 1.5rem; color: var(--gold); font-weight: bold; font-family: monospace; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-        .modal-content { background: #1a1a1a; padding: 20px; border-radius: 20px; width: 85%; max-width: 300px; border: 1px solid #333; text-align: center; }
-        .modal-content input { width: 100%; padding: 12px; margin: 15px 0; border-radius: 10px; background: #000; color: #fff; text-align: center; font-size: 1.8rem; border: 1px solid #444; outline: none; }
-        
-        #historyMenu { display: none; flex-direction: column; align-items: center; width: 100%; }
+        .modal-content { background: #1a1a1a; padding: 25px; border-radius: 20px; width: 85%; max-width: 300px; border: 1px solid #333; text-align: center; }
+        .modal-content input { width: 100%; padding: 15px; margin: 15px 0; border-radius: 10px; background: #000; color: #fff; text-align: center; font-size: 2rem; border: 1px solid #444; outline: none; }
         .history-list { width: 100%; max-height: 250px; overflow-y: auto; margin-top: 10px; border-top: 1px solid #333; }
-        .history-item { padding: 10px 5px; border-bottom: 1px solid #222; font-size: 0.75rem; display: flex; justify-content: space-between; align-items: center; }
+        .history-item { padding: 10px 5px; border-bottom: 1px solid #222; font-size: 0.8rem; display: flex; justify-content: space-between; }
     </style>
 </head>
 <body>
@@ -72,7 +45,8 @@
         <button class="settings-btn" onclick="toggleSettings()">⚙️</button>
     </header>
 
-    <div class="container" id="mainContainer"></div>
+    <div class="container" id="mainContainer">
+        </div>
 
     <button class="clear-btn" onclick="clearAll()">تصفير الخانات (Clear)</button>
 
@@ -86,12 +60,120 @@
             <h3 id="modalTitle" style="color:var(--gold)"></h3>
             <input type="number" id="countInput" placeholder="0" inputmode="numeric">
             <div style="display:flex; gap:10px">
-                <button onclick="confirmCount()" style="flex:1; padding:12px; background:var(--gold); border:none; border-radius:10px; font-weight:bold; color:#000">حفظ</button>
-                <button onclick="closeModal()" style="flex:1; padding:12px; background:#333; border:none; border-radius:10px; color:#fff">إلغاء</button>
+                <button onclick="confirmCount()" style="flex:1; padding:12px; background:var(--gold); border-radius:10px; font-weight:bold; border:none;">حفظ</button>
+                <button onclick="closeModal()" style="flex:1; padding:12px; background:#333; border-radius:10px; color:#fff; border:none;">إلغاء</button>
             </div>
         </div>
     </div>
 
     <div id="settingsModal" class="modal">
-        <div class="modal-content" style="max-width:350px; width:90%">
-            <h3 style="color:var(--gold); margin-bottom:15px">القائمة الرئيسية
+        <div class="modal-content">
+            <h3 style="color:var(--gold); margin-bottom:15px">السجل</h3>
+            <div id="historyList" class="history-list"></div>
+            <button onclick="clearHistory()" style="color:var(--danger); background:none; border:none; margin-top:15px; font-size:0.8rem; text-decoration:underline">مسح السجل</button>
+            <button onclick="toggleSettings()" style="width:100%; padding:10px; margin-top:15px; background:#333; border-radius:10px; color:#fff; border:none;">إغلاق</button>
+        </div>
+    </div>
+
+    <script>
+        const config = [
+            { feya: 200, multiplier: 20000 },
+            { feya: 100, multiplier: 10000 },
+            { feya: 50,  multiplier: 5000 },
+            { feya: 20,  multiplier: 2000 },
+            { feya: 10,  multiplier: 1000 },
+            { feya: 5,   multiplier: 500 },
+            { feya: 1,   multiplier: 100 },
+            { feya: 0.5, multiplier: 50 }
+        ];
+
+        let cashData = { 200:0, 100:0, 50:0, 20:0, 10:0, 5:0, 1:0, 0.5:0 };
+        let activeFeya = null;
+
+        function init() {
+            const container = document.getElementById('mainContainer');
+            container.innerHTML = ""; 
+            config.forEach(item => {
+                container.innerHTML += `
+                    <div class="cash-row" onclick="openInput(${item.feya})">
+                        <div style="display:flex; align-items:center;">
+                            <div class="feya-btn">${item.feya}</div>
+                            <span class="count-text" id="count-${item.feya}">العدد: 0</span>
+                        </div>
+                        <span class="sum-text" id="sum-${item.feya}">0</span>
+                    </div>`;
+            });
+        }
+
+        function openInput(val) {
+            activeFeya = val;
+            document.getElementById('modalTitle').innerText = `فئة ${val}`;
+            document.getElementById('countInput').value = "";
+            document.getElementById('inputModal').style.display = 'flex';
+            setTimeout(() => document.getElementById('countInput').focus(), 100);
+        }
+
+        function closeModal() { document.getElementById('inputModal').style.display = 'none'; }
+        function toggleSettings() {
+            const m = document.getElementById('settingsModal');
+            if (m.style.display === 'flex') { m.style.display = 'none'; } 
+            else { m.style.display = 'flex'; showHistory(); }
+        }
+
+        function formatNumber(num) { return num.toLocaleString('en-US'); }
+
+        function confirmCount() {
+            let count = parseInt(document.getElementById('countInput').value) || 0;
+            cashData[activeFeya] = count;
+            let itemConfig = config.find(c => c.feya === activeFeya);
+            document.getElementById(`count-${activeFeya}`).innerText = `العدد: ${count}`;
+            document.getElementById(`sum-${activeFeya}`).innerText = formatNumber(count * itemConfig.multiplier);
+            updateGrandTotal();
+            closeModal();
+        }
+
+        function updateGrandTotal() {
+            let total = 0;
+            config.forEach(item => { total += (cashData[item.feya] * item.multiplier); });
+            document.getElementById('grandTotal').innerText = formatNumber(total);
+            return total;
+        }
+
+        function clearAll() {
+            let currentTotal = updateGrandTotal();
+            if(currentTotal > 0 && confirm("تصفير وحفظ في السجل؟")) {
+                saveToHistory(currentTotal);
+                config.forEach(item => {
+                    cashData[item.feya] = 0;
+                    document.getElementById(`count-${item.feya}`).innerText = "العدد: 0";
+                    document.getElementById(`sum-${item.feya}`).innerText = "0";
+                });
+                updateGrandTotal();
+            }
+        }
+
+        function saveToHistory(amount) {
+            let history = JSON.parse(localStorage.getItem('cashHistory') || '[]');
+            const now = new Date();
+            const timeStr = `${now.getHours()}:${now.getMinutes().toString().padStart(2,'0')} - ${now.toLocaleDateString('ar-EG')}`;
+            history.unshift({ time: timeStr, total: formatNumber(amount) });
+            localStorage.setItem('cashHistory', JSON.stringify(history.slice(0, 50)));
+        }
+
+        function showHistory() {
+            const list = document.getElementById('historyList');
+            const history = JSON.parse(localStorage.getItem('cashHistory') || '[]');
+            list.innerHTML = history.length ? '' : '<p style="color:#666">السجل فارغ</p>';
+            history.forEach(item => {
+                list.innerHTML += `<div class="history-item"><span>${item.time}</span><span style="color:var(--gold)">${item.total}</span></div>`;
+            });
+        }
+
+        function clearHistory() { if(confirm("مسح السجل؟")) { localStorage.removeItem('cashHistory'); showHistory(); } }
+
+        document.getElementById('countInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') confirmCount(); });
+
+        init(); // تشغيل البرنامج فوراً
+    </script>
+</body>
+</html>
