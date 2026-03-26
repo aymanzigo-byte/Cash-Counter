@@ -3,10 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cash Counter v2</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0a0a0a">
+    
+    <title>Cash Counter Pro</title>
     <style>
         :root { --gold: #ffd700; --bg: #0a0a0a; --card: #161616; --text: #ffffff; }
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { 
             background: var(--bg); 
             color: var(--text); 
@@ -17,88 +22,149 @@
             flex-direction: column; 
             align-items: center; 
             height: 100vh; 
-            overflow: hidden; /* يمنع السكرول تماماً */
+            overflow: hidden; 
+            user-select: none;
         }
         
-        h2 { color: var(--gold); margin: 10px 0; font-size: 1.2rem; }
+        h2 { color: var(--gold); margin: 5px 0 10px 0; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px; }
 
         .container { 
             width: 100%; 
             max-width: 380px; 
             display: flex; 
             flex-direction: column; 
-            gap: 8px; /* مسافة صغيرة بين الخانات */
+            gap: 6px; 
             flex: 1;
             justify-content: center;
         }
 
-        /* ستايل الخانة المضغوط */
         .cash-row { 
             background: var(--card); 
             border: 1px solid #2a2a2a; 
             border-radius: 12px; 
-            padding: 10px 15px; 
+            padding: 12px 15px; 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
             cursor: pointer;
+            transition: transform 0.1s;
         }
+        .cash-row:active { transform: scale(0.97); background: #222; }
         
         .label-group { display: flex; align-items: center; gap: 12px; }
         .feya-btn { 
             background: var(--gold); 
             color: #000; 
             font-weight: bold; 
-            width: 45px; 
-            height: 45px; 
+            width: 42px; 
+            height: 42px; 
             border-radius: 10px; 
             display: flex; 
             justify-content: center; 
             align-items: center; 
             font-size: 1.1rem; 
+            box-shadow: 0 4px 10px rgba(255, 215, 0, 0.2);
         }
         
-        .count-text { color: #888; font-size: 0.75rem; }
+        .count-text { color: #888; font-size: 0.75rem; display: block; margin-top: 2px; }
         .sum-text { color: var(--gold); font-size: 1.1rem; font-weight: bold; font-family: monospace; }
 
-        /* الإجمالي الكلي */
         .total-footer { 
-            margin-top: 15px; 
-            background: linear-gradient(45deg, #1a1a1a, #222); 
+            margin-top: 10px; 
+            background: linear-gradient(135deg, #1a1a1a 0%, #000 100%); 
             border: 1px solid var(--gold); 
             border-radius: 15px; 
-            padding: 15px; 
+            padding: 18px; 
             width: 100%; 
             max-width: 380px;
             display: flex; 
             justify-content: space-between; 
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
         }
-        .total-label { font-size: 1.1rem; font-weight: bold; }
-        .total-value { font-size: 1.5rem; color: var(--gold); font-weight: bold; font-family: monospace; }
+        .total-label { font-size: 1.1rem; font-weight: bold; color: #fff; }
+        .total-value { font-size: 1.6rem; color: var(--gold); font-weight: bold; font-family: monospace; }
 
         /* المودال */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 100; justify-content: center; align-items: center; }
-        .modal-content { background: #1a1a1a; padding: 20px; border-radius: 20px; width: 85%; max-width: 280px; border: 1px solid var(--gold); }
-        .modal-content input { width: 100%; padding: 12px; margin: 15px 0; border-radius: 10px; border: 1px solid #333; background: #000; color: #fff; text-align: center; font-size: 1.4rem; }
-        .modal-btns { display: flex; gap: 8px; }
-        .modal-btns button { flex: 1; padding: 10px; border-radius: 8px; border: none; font-weight: bold; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .modal-content { background: #1a1a1a; padding: 25px; border-radius: 25px; width: 85%; max-width: 300px; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,1); }
+        .modal-content h3 { margin: 0 0 15px 0; color: var(--gold); font-size: 1.2rem; }
+        .modal-content input { width: 100%; padding: 15px; margin-bottom: 20px; border-radius: 12px; border: 1px solid #444; background: #000; color: #fff; text-align: center; font-size: 1.8rem; outline: none; }
+        .modal-btns { display: flex; gap: 10px; }
+        .modal-btns button { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: bold; font-size: 1rem; }
         .ok-btn { background: var(--gold); color: #000; }
         .cancel-btn { background: #333; color: #fff; }
     </style>
 </head>
 <body>
 
-    <h2>Cash Counter 💰</h2>
+    <h2>Cash Counter Pro</h2>
 
     <div class="container" id="mainContainer"></div>
 
     <div class="total-footer">
-        <span class="total-label">الإجمالي:</span>
+        <span class="total-label">الإجمالي الكلي</span>
         <span id="grandTotal" class="total-value">0</span>
     </div>
 
     <div id="inputModal" class="modal">
         <div class="modal-content">
-            <h3 id="modalTitle" style="margin
+            <h3 id="modalTitle"></h3>
+            <input type="number" id="countInput" placeholder="0" inputmode="numeric">
+            <div class="modal-btns">
+                <button class="ok-btn" onclick="confirmCount()">OK</button>
+                <button class="cancel-btn" onclick="closeModal()">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const feyat = [200, 100, 50, 20, 10, 5];
+        let cashData = { 200:0, 100:0, 50:0, 20:0, 10:0, 5:0 };
+        let activeFeya = null;
+
+        const container = document.getElementById('mainContainer');
+        feyat.forEach(val => {
+            container.innerHTML += `
+                <div class="cash-row" onclick="openInput(${val})">
+                    <div class="label-group">
+                        <div class="feya-btn">${val}</div>
+                        <div>
+                           <span class="count-text" id="count-${val}">العدد: 0</span>
+                        </div>
+                    </div>
+                    <span class="sum-text" id="sum-${val}">0.00</span>
+                </div>
+            `;
+        });
+
+        function openInput(val) {
+            activeFeya = val;
+            document.getElementById('modalTitle').innerText = `كم ورقة فئة ${val}؟`;
+            document.getElementById('countInput').value = "";
+            document.getElementById('inputModal').style.display = 'flex';
+            setTimeout(() => document.getElementById('countInput').focus(), 150);
+        }
+
+        function closeModal() { document.getElementById('inputModal').style.display = 'none'; }
+
+        function confirmCount() {
+            let count = parseInt(document.getElementById('countInput').value) || 0;
+            cashData[activeFeya] = count;
+            document.getElementById(`count-${activeFeya}`).innerText = `العدد: ${count}`;
+            document.getElementById(`sum-${activeFeya}`).innerText = (count * activeFeya).toLocaleString('en-US', {minimumFractionDigits: 2});
+            updateGrandTotal();
+            closeModal();
+        }
+
+        function updateGrandTotal() {
+            let total = 0;
+            feyat.forEach(val => total += (cashData[val] * val));
+            document.getElementById('grandTotal').innerText = total.toLocaleString('en-US');
+        }
+
+        document.getElementById('countInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') confirmCount(); });
+    </script>
+</body>
+</html>
