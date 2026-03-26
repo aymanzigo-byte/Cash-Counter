@@ -14,86 +14,40 @@
         :root { --gold: #ffd700; --bg: #0a0a0a; --card: #161616; --text: #ffffff; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { 
-            background: var(--bg); 
-            color: var(--text); 
+            background: var(--bg); color: var(--text); 
             font-family: system-ui, -apple-system, sans-serif; 
-            margin: 0; 
-            padding: 10px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            height: 100vh; 
-            overflow: hidden; 
-            user-select: none;
+            margin: 0; padding: 10px; display: flex; flex-direction: column; 
+            align-items: center; height: 100vh; overflow: hidden; user-select: none;
         }
-        
         h2 { color: var(--gold); margin: 5px 0 10px 0; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px; }
-
-        .container { 
-            width: 100%; 
-            max-width: 380px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 6px; 
-            flex: 1;
-            justify-content: center;
-        }
-
+        .container { width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 6px; flex: 1; justify-content: center; }
         .cash-row { 
-            background: var(--card); 
-            border: 1px solid #2a2a2a; 
-            border-radius: 12px; 
-            padding: 12px 15px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            cursor: pointer;
-            transition: transform 0.1s;
+            background: var(--card); border: 1px solid #2a2a2a; border-radius: 12px; 
+            padding: 12px 15px; display: flex; justify-content: space-between; 
+            align-items: center; cursor: pointer; transition: transform 0.1s;
         }
         .cash-row:active { transform: scale(0.97); background: #222; }
-        
         .label-group { display: flex; align-items: center; gap: 12px; }
         .feya-btn { 
-            background: var(--gold); 
-            color: #000; 
-            font-weight: bold; 
-            width: 42px; 
-            height: 42px; 
-            border-radius: 10px; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            font-size: 1.1rem; 
-            box-shadow: 0 4px 10px rgba(255, 215, 0, 0.2);
+            background: var(--gold); color: #000; font-weight: bold; width: 42px; height: 42px; 
+            border-radius: 10px; display: flex; justify-content: center; align-items: center; 
+            font-size: 1.1rem; box-shadow: 0 4px 10px rgba(255, 215, 0, 0.2);
         }
-        
         .count-text { color: #888; font-size: 0.75rem; display: block; margin-top: 2px; }
-        .sum-text { color: var(--gold); font-size: 1.1rem; font-weight: bold; font-family: monospace; }
-
+        .sum-text { color: var(--gold); font-size: 1.15rem; font-weight: bold; font-family: 'Courier New', monospace; }
         .total-footer { 
-            margin-top: 10px; 
-            background: linear-gradient(135deg, #1a1a1a 0%, #000 100%); 
-            border: 1px solid var(--gold); 
-            border-radius: 15px; 
-            padding: 18px; 
-            width: 100%; 
-            max-width: 380px;
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            margin-bottom: 5px;
-            box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
+            margin-top: 10px; background: linear-gradient(135deg, #1a1a1a 0%, #000 100%); 
+            border: 1px solid var(--gold); border-radius: 15px; padding: 18px; 
+            width: 100%; max-width: 380px; display: flex; justify-content: space-between; 
+            align-items: center; margin-bottom: 5px; box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
         }
         .total-label { font-size: 1.1rem; font-weight: bold; color: #fff; }
-        .total-value { font-size: 1.6rem; color: var(--gold); font-weight: bold; font-family: monospace; }
-
-        /* المودال */
+        .total-value { font-size: 1.6rem; color: var(--gold); font-weight: bold; font-family: 'Courier New', monospace; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-        .modal-content { background: #1a1a1a; padding: 25px; border-radius: 25px; width: 85%; max-width: 300px; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,1); }
-        .modal-content h3 { margin: 0 0 15px 0; color: var(--gold); font-size: 1.2rem; }
+        .modal-content { background: #1a1a1a; padding: 25px; border-radius: 25px; width: 85%; max-width: 300px; border: 1px solid #333; }
         .modal-content input { width: 100%; padding: 15px; margin-bottom: 20px; border-radius: 12px; border: 1px solid #444; background: #000; color: #fff; text-align: center; font-size: 1.8rem; outline: none; }
         .modal-btns { display: flex; gap: 10px; }
-        .modal-btns button { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: bold; font-size: 1rem; }
+        .modal-btns button { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: bold; }
         .ok-btn { background: var(--gold); color: #000; }
         .cancel-btn { background: #333; color: #fff; }
     </style>
@@ -121,28 +75,33 @@
     </div>
 
     <script>
-        const feyat = [200, 100, 50, 20, 10, 5];
+        const config = [
+            { feya: 200, multiplier: 20000 },
+            { feya: 100, multiplier: 10000 },
+            { feya: 50,  multiplier: 5000 },
+            { feya: 20,  multiplier: 2000 },
+            { feya: 10,  multiplier: 1000 },
+            { feya: 5,   multiplier: 500 }
+        ];
+
         let cashData = { 200:0, 100:0, 50:0, 20:0, 10:0, 5:0 };
         let activeFeya = null;
 
         const container = document.getElementById('mainContainer');
-        feyat.forEach(val => {
+        config.forEach(item => {
             container.innerHTML += `
-                <div class="cash-row" onclick="openInput(${val})">
+                <div class="cash-row" onclick="openInput(${item.feya})">
                     <div class="label-group">
-                        <div class="feya-btn">${val}</div>
-                        <div>
-                           <span class="count-text" id="count-${val}">العدد: 0</span>
-                        </div>
+                        <div class="feya-btn">${item.feya}</div>
+                        <div><span class="count-text" id="count-${item.feya}">العدد: 0</span></div>
                     </div>
-                    <span class="sum-text" id="sum-${val}">0.00</span>
-                </div>
-            `;
+                    <span class="sum-text" id="sum-${item.feya}">0</span>
+                </div>`;
         });
 
         function openInput(val) {
             activeFeya = val;
-            document.getElementById('modalTitle').innerText = `كم ورقة فئة ${val}؟`;
+            document.getElementById('modalTitle').innerText = `عدد فئة ${val}`;
             document.getElementById('countInput').value = "";
             document.getElementById('inputModal').style.display = 'flex';
             setTimeout(() => document.getElementById('countInput').focus(), 150);
@@ -150,19 +109,23 @@
 
         function closeModal() { document.getElementById('inputModal').style.display = 'none'; }
 
+        function formatNumber(num) { return num.toLocaleString('en-US'); }
+
         function confirmCount() {
             let count = parseInt(document.getElementById('countInput').value) || 0;
             cashData[activeFeya] = count;
+            let itemConfig = config.find(c => c.feya === activeFeya);
+            let result = count * itemConfig.multiplier;
             document.getElementById(`count-${activeFeya}`).innerText = `العدد: ${count}`;
-            document.getElementById(`sum-${activeFeya}`).innerText = (count * activeFeya).toLocaleString('en-US', {minimumFractionDigits: 2});
+            document.getElementById(`sum-${activeFeya}`).innerText = formatNumber(result);
             updateGrandTotal();
             closeModal();
         }
 
         function updateGrandTotal() {
             let total = 0;
-            feyat.forEach(val => total += (cashData[val] * val));
-            document.getElementById('grandTotal').innerText = total.toLocaleString('en-US');
+            config.forEach(item => { total += (cashData[item.feya] * item.multiplier); });
+            document.getElementById('grandTotal').innerText = formatNumber(total);
         }
 
         document.getElementById('countInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') confirmCount(); });
