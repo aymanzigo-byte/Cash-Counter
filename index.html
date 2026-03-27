@@ -6,23 +6,27 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#0a0a0a">
-    <link rel="manifest" href="manifest.json">
     <title>تجميع فئات مصرية</title>
     <style>
-        :root { --gold: #ffd700; --bg: #0a0a0a; --card: #161616; --text: #ffffff; --danger: #ff4b2b; }
+        :root { --gold: #ffd700; --bg: #0a0a0a; --card: #161616; --text: #ffffff; --danger: #ff4b2b; --success: #28a745; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
         body { background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; padding: 10px; display: flex; flex-direction: column; align-items: center; height: 100vh; overflow: hidden; }
 
-        /* شاشة البداية - مضافة بأعلى أولوية */
-        #splashScreen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 99999; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; text-align: center;
-            pointer-events: none; /* عشان لو علقت تقدر تدوس تحتها عادي */
-        }
+        /* شاشة البداية */
+        #splashScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; pointer-events: none; }
         .splash-logo { color: var(--gold); font-size: 2rem; font-weight: bold; margin-bottom: 20px; }
         .produced-by { color: #555; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; }
         .dev-name { color: #fff; font-size: 1.1rem; margin-top: 5px; }
+
+        /* نظام الإشعارات (Toast) */
+        #toast {
+            position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%);
+            background: var(--card); color: var(--gold); padding: 12px 25px;
+            border-radius: 50px; border: 1px solid var(--gold); font-weight: bold;
+            z-index: 10000; transition: bottom 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5); font-size: 0.9rem; white-space: nowrap;
+        }
+        #toast.show { bottom: 30px; }
 
         /* الواجهة */
         header { width: 100%; max-width: 380px; display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #222; }
@@ -36,6 +40,8 @@
         .clear-btn { background: none; border: 1px solid var(--danger); color: var(--danger); padding: 8px 25px; border-radius: 8px; cursor: pointer; margin-bottom: 10px; font-weight: bold; }
         .total-footer { background: linear-gradient(135deg, #1a1a1a 0%, #000 100%); border: 1px solid var(--gold); border-radius: 12px; padding: 15px; width: 100%; max-width: 380px; display: flex; justify-content: space-between; align-items: center; }
         .total-value { font-size: 1.5rem; color: var(--gold); font-weight: bold; font-family: monospace; }
+
+        /* المودالات */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 100; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
         .modal-content { background: #1a1a1a; padding: 20px; border-radius: 20px; width: 90%; max-width: 380px; border: 1px solid #333; text-align: center; }
         .modal input { width: 100%; padding: 15px; margin: 15px 0; border-radius: 10px; background: #000; color: #fff; text-align: center; font-size: 2rem; border: 1px solid #444; outline: none; }
@@ -51,6 +57,8 @@
         <div class="dev-name">[Ayman Mahmoud]</div>
     </div>
 
+    <div id="toast">✅ تم الحفظ وتصفير السجل</div>
+
     <header>
         <div style="width:30px"></div>
         <h2>تجميع فئات مصرية</h2>
@@ -58,7 +66,7 @@
     </header>
 
     <div class="container" id="mainContainer"></div>
-    <button class="clear-btn" onclick="clearAll()">تصفير وحفظ (Clear)</button>
+    <button class="clear-btn" onclick="handleClear()">تصفير وحفظ (Clear)</button>
 
     <div class="total-footer">
         <span style="font-weight:bold">الإجمالي الكلي</span>
@@ -70,18 +78,13 @@
     <div id="reviewModal" class="modal"><div class="modal-content"><div id="reviewContainer" style="display:flex; flex-direction:column; gap:5px; margin-bottom:15px"></div><button onclick="closeReview()" class="back-btn">رجوع للسجل</button></div></div>
 
     <script>
-        // دالة الإخفاء مع تأمين شامل
-        function startApp() {
-            setTimeout(() => {
-                const splash = document.getElementById('splashScreen');
-                if(splash) {
-                    splash.style.transition = "opacity 0.5s ease";
-                    splash.style.opacity = "0";
-                    setTimeout(() => { splash.style.display = "none"; }, 500);
-                }
-            }, 2000);
-            init();
-        }
+        // إخفاء الـ Splash Screen
+        setTimeout(() => {
+            const splash = document.getElementById('splashScreen');
+            splash.style.transition = "opacity 0.6s ease";
+            splash.style.opacity = "0";
+            setTimeout(() => splash.style.display = "none", 600);
+        }, 2000);
 
         const config = [
             { feya: 200, multiplier: 20000 }, { feya: 100, multiplier: 10000 },
@@ -101,20 +104,54 @@
             });
         }
 
-        function formatNumber(num) { return num.toLocaleString('en-US'); }
+        // دالة الإشعار الشيك
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 2500);
+        }
+
+        function handleClear() {
+            let total = 0;
+            config.forEach(item => { total += (cashData[item.feya] * item.multiplier); });
+
+            if(total > 0) {
+                // حفظ البيانات في السجل
+                let history = JSON.parse(localStorage.getItem('fullCashHistory') || '[]');
+                const now = new Date();
+                history.unshift({
+                    id: Date.now(),
+                    time: `${now.getHours()}:${now.getMinutes().toString().padStart(2,'0')} - ${now.toLocaleDateString('ar-EG')}`,
+                    total: total.toLocaleString('en-US'),
+                    details: {...cashData}
+                });
+                localStorage.setItem('fullCashHistory', JSON.stringify(history.slice(0, 50)));
+
+                // تصفير الواجهة
+                config.forEach(item => {
+                    cashData[item.feya] = 0;
+                    document.getElementById(`count-${item.feya}`).innerText = "العدد: 0";
+                    document.getElementById(`sum-${item.feya}`).innerText = "0";
+                });
+                document.getElementById('grandTotal').innerText = "0";
+                
+                // إظهار الإشعار بدلاً من الـ Confirm
+                showToast();
+            }
+        }
+
+        // باقي الوظائف المعتادة
         function openInput(val) { activeFeya = val; document.getElementById('modalTitle').innerText = `فئة ${val}`; document.getElementById('countInput').value = ""; document.getElementById('inputModal').style.display = 'flex'; setTimeout(() => document.getElementById('countInput').focus(), 100); }
         function closeModal() { document.getElementById('inputModal').style.display = 'none'; }
-        function confirmCount() { let count = parseInt(document.getElementById('countInput').value) || 0; cashData[activeFeya] = count; document.getElementById(`count-${activeFeya}`).innerText = `العدد: ${count}`; document.getElementById(`sum-${activeFeya}`).innerText = formatNumber(count * config.find(c => c.feya === activeFeya).multiplier); updateGrandTotal(); closeModal(); }
-        function updateGrandTotal() { let total = 0; config.forEach(item => { total += (cashData[item.feya] * item.multiplier); }); document.getElementById('grandTotal').innerText = formatNumber(total); return total; }
+        function confirmCount() { let count = parseInt(document.getElementById('countInput').value) || 0; cashData[activeFeya] = count; document.getElementById(`count-${activeFeya}`).innerText = `العدد: ${count}`; document.getElementById(`sum-${activeFeya}`).innerText = (count * config.find(c => c.feya === activeFeya).multiplier).toLocaleString('en-US'); updateGrandTotal(); closeModal(); }
+        function updateGrandTotal() { let total = 0; config.forEach(item => { total += (cashData[item.feya] * item.multiplier); }); document.getElementById('grandTotal').innerText = total.toLocaleString('en-US'); }
         function toggleSettings() { const m = document.getElementById('settingsModal'); m.style.display = m.style.display === 'flex' ? 'none' : 'flex'; if (m.style.display === 'flex') showHistory(); }
-        function clearAll() { let total = updateGrandTotal(); if(total > 0 && confirm("حفظ العملية وتصفير الخانات؟")) { let history = JSON.parse(localStorage.getItem('fullCashHistory') || '[]'); const now = new Date(); history.unshift({ id: Date.now(), time: `${now.getHours()}:${now.getMinutes().toString().padStart(2,'0')} - ${now.toLocaleDateString('ar-EG')}`, total: formatNumber(total), details: {...cashData} }); localStorage.setItem('fullCashHistory', JSON.stringify(history.slice(0, 50))); config.forEach(item => { cashData[item.feya] = 0; document.getElementById(`count-${item.feya}`).innerText = "العدد: 0"; document.getElementById(`sum-${item.feya}`).innerText = "0"; }); updateGrandTotal(); } }
         function showHistory() { const list = document.getElementById('historyList'); const history = JSON.parse(localStorage.getItem('fullCashHistory') || '[]'); list.innerHTML = history.length ? '' : '<p style="color:#666; text-align:center; padding:20px;">السجل فارغ</p>'; history.forEach(item => { list.innerHTML += `<div class="history-item" onclick="openReview(${item.id})"><div style="text-align:right"><div style="font-weight:bold; color:#fff">${item.time}</div><div style="font-size:0.75rem; color:var(--gold)">إجمالي: ${item.total}</div></div><span style="color:var(--gold); font-size:1.2rem">◀</span></div>`; }); }
-        function openReview(id) { const history = JSON.parse(localStorage.getItem('fullCashHistory') || '[]'); const entry = history.find(h => h.id === id); if(!entry) return; const container = document.getElementById('reviewContainer'); container.innerHTML = `<h3 style="color:var(--gold); margin-bottom:15px">مراجعة: ${entry.total}</h3>`; config.forEach(item => { let count = entry.details[item.feya] || 0; container.innerHTML += `<div class="cash-row" style="cursor:default; opacity:0.8"><div style="display:flex; align-items:center;"><div class="feya-btn">${item.feya}</div><span class="count-text">العدد: ${count}</span></div><span class="sum-text">${formatNumber(count * item.multiplier)}</span></div>`; }); document.getElementById('reviewModal').style.display = 'flex'; }
+        function openReview(id) { const history = JSON.parse(localStorage.getItem('fullCashHistory') || '[]'); const entry = history.find(h => h.id === id); if(!entry) return; const container = document.getElementById('reviewContainer'); container.innerHTML = `<h3 style="color:var(--gold); margin-bottom:15px">مراجعة: ${entry.total}</h3>`; config.forEach(item => { let count = entry.details[item.feya] || 0; container.innerHTML += `<div class="cash-row" style="cursor:default; opacity:0.8"><div style="display:flex; align-items:center;"><div class="feya-btn">${item.feya}</div><span class="count-text">العدد: ${count}</span></div><span class="sum-text">${(count * item.multiplier).toLocaleString('en-US')}</span></div>`; }); document.getElementById('reviewModal').style.display = 'flex'; }
         function closeReview() { document.getElementById('reviewModal').style.display = 'none'; }
         function clearHistory() { if(confirm("مسح السجل؟")) { localStorage.removeItem('fullCashHistory'); showHistory(); } }
 
-        // بدء التشغيل
-        startApp();
+        init();
     </script>
 </body>
 </html>
