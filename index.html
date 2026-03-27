@@ -6,53 +6,61 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#0a0a0a">
-    <title>تجميع فئات مصرية</title>
     <link rel="manifest" href="manifest.json">
+    <title>تجميع فئات مصرية</title>
     <style>
-        :root { --gold: #ffd700; --bg: #0a0a0a; --card: #161616; --text: #ffffff; --danger: #ff4b2b; }
+        :root { --gold: #ffd700; --bg: #0a0a0a; --card: #161616; --text: #ffffff; --danger: #ff4b2b; --info: #00d4ff; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-        body { 
-            background: var(--bg); color: var(--text); 
-            font-family: system-ui, -apple-system, sans-serif; 
-            padding: 10px; display: flex; flex-direction: column; 
-            align-items: center; height: 100vh; overflow: hidden; user-select: none;
-        }
+        body { background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; padding: 10px; display: flex; flex-direction: column; align-items: center; height: 100vh; overflow: hidden; }
+        
         header { width: 100%; max-width: 380px; display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #222; }
         h2 { color: var(--gold); font-size: 1.1rem; }
         .settings-btn { background: none; border: none; color: var(--gold); font-size: 1.5rem; cursor: pointer; }
+
         .container { width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 5px; flex: 1; justify-content: center; margin: 10px 0; }
+        
         .cash-row { 
             background: var(--card); border: 1px solid #2a2a2a; border-radius: 10px; 
             padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer;
         }
+        .cash-row.readonly { cursor: default; opacity: 0.9; }
+        
         .feya-btn { background: var(--gold); color: #000; font-weight: bold; width: 40px; height: 40px; border-radius: 8px; display: flex; justify-content: center; align-items: center; }
         .count-text { color: #888; font-size: 0.75rem; margin-right: 10px; }
         .sum-text { color: var(--gold); font-size: 1.1rem; font-weight: bold; font-family: monospace; }
+        
         .clear-btn { background: none; border: 1px solid var(--danger); color: var(--danger); padding: 8px 25px; border-radius: 8px; cursor: pointer; margin-bottom: 10px; font-weight: bold; }
+        
         .total-footer { background: linear-gradient(135deg, #1a1a1a 0%, #000 100%); border: 1px solid var(--gold); border-radius: 12px; padding: 15px; width: 100%; max-width: 380px; display: flex; justify-content: space-between; align-items: center; }
         .total-value { font-size: 1.5rem; color: var(--gold); font-weight: bold; font-family: monospace; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-        .modal-content { background: #1a1a1a; padding: 25px; border-radius: 20px; width: 85%; max-width: 300px; border: 1px solid #333; text-align: center; }
-        .modal-content input { width: 100%; padding: 15px; margin: 15px 0; border-radius: 10px; background: #000; color: #fff; text-align: center; font-size: 2rem; border: 1px solid #444; outline: none; }
-        .history-list { width: 100%; max-height: 250px; overflow-y: auto; margin-top: 10px; border-top: 1px solid #333; }
-        .history-item { padding: 10px 5px; border-bottom: 1px solid #222; font-size: 0.8rem; display: flex; justify-content: space-between; }
+
+        /* المودالات */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 100; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .modal-content { background: #1a1a1a; padding: 20px; border-radius: 20px; width: 90%; max-width: 380px; border: 1px solid #333; text-align: center; position: relative; max-height: 90vh; overflow-y: auto; }
+        
+        .modal input { width: 100%; padding: 15px; margin: 15px 0; border-radius: 10px; background: #000; color: #fff; text-align: center; font-size: 2rem; border: 1px solid #444; outline: none; }
+        
+        .history-item { padding: 15px; border-bottom: 1px solid #222; cursor: pointer; text-align: right; display: flex; justify-content: space-between; align-items: center; }
+        .history-item:active { background: #222; }
+        
+        .review-header { color: var(--info); margin-bottom: 15px; font-size: 0.9rem; border: 1px dashed var(--info); padding: 5px; border-radius: 5px; }
+        .back-btn { background: #333; color: #fff; padding: 10px; border-radius: 8px; border: none; width: 100%; margin-top: 15px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <header>
+    <header id="mainHeader">
         <div style="width:30px"></div>
         <h2>تجميع فئات مصرية</h2>
         <button class="settings-btn" onclick="toggleSettings()">⚙️</button>
     </header>
 
-    <div class="container" id="mainContainer">
-        </div>
+    <div class="container" id="mainContainer"></div>
 
-    <button class="clear-btn" onclick="clearAll()">تصفير الخانات (Clear)</button>
+    <button class="clear-btn" id="clearBtn" onclick="clearAll()">تصفير وحفظ (Clear)</button>
 
     <div class="total-footer">
-        <span style="font-weight:bold">الإجمالي الكلي</span>
+        <span id="footerLabel" style="font-weight:bold">الإجمالي الكلي</span>
         <span id="grandTotal" class="total-value">0</span>
     </div>
 
@@ -61,34 +69,44 @@
             <h3 id="modalTitle" style="color:var(--gold)"></h3>
             <input type="number" id="countInput" placeholder="0" inputmode="numeric">
             <div style="display:flex; gap:10px">
-                <button onclick="confirmCount()" style="flex:1; padding:12px; background:var(--gold); border-radius:10px; font-weight:bold; border:none;">حفظ</button>
+                <button onclick="confirmCount()" style="flex:1; padding:12px; background:var(--gold); border-radius:10px; font-weight:bold; border:none; color:#000">حفظ</button>
                 <button onclick="closeModal()" style="flex:1; padding:12px; background:#333; border-radius:10px; color:#fff; border:none;">إلغاء</button>
             </div>
         </div>
     </div>
 
     <div id="settingsModal" class="modal">
-        <div class="modal-content">
-            <h3 style="color:var(--gold); margin-bottom:15px">السجل</h3>
-            <div id="historyList" class="history-list"></div>
+        <div class="modal-content" id="settingsContent">
+            <h3 style="color:var(--gold); margin-bottom:15px">سجل العمليات</h3>
+            <div id="historyList" style="text-align:right;"></div>
             <button onclick="clearHistory()" style="color:var(--danger); background:none; border:none; margin-top:15px; font-size:0.8rem; text-decoration:underline">مسح السجل</button>
-            <button onclick="toggleSettings()" style="width:100%; padding:10px; margin-top:15px; background:#333; border-radius:10px; color:#fff; border:none;">إغلاق</button>
+            <button onclick="toggleSettings()" class="back-btn">إغلاق</button>
+        </div>
+    </div>
+
+    <div id="reviewModal" class="modal">
+        <div class="modal-content">
+            <div class="review-header">⚠️ وضع المراجعة (غير قابل للتعديل)</div>
+            <div id="reviewDate" style="font-size:0.8rem; color:#888; margin-bottom:10px"></div>
+            <div id="reviewContainer" style="display:flex; flex-direction:column; gap:5px; margin-bottom:15px"></div>
+            <div class="total-footer" style="width:100%">
+                <span>إجمالي النسخة</span>
+                <span id="reviewTotal" class="total-value">0</span>
+            </div>
+            <button onclick="closeReview()" class="back-btn">رجوع للسجل</button>
         </div>
     </div>
 
     <script>
         const config = [
-            { feya: 200, multiplier: 20000 },
-            { feya: 100, multiplier: 10000 },
-            { feya: 50,  multiplier: 5000 },
-            { feya: 20,  multiplier: 2000 },
-            { feya: 10,  multiplier: 1000 },
-            { feya: 5,   multiplier: 500 },
-            { feya: 1,   multiplier: 100 },
-            { feya: 0.5, multiplier: 50 }
+            { feya: 200, multiplier: 20000 }, { feya: 100, multiplier: 10000 },
+            { feya: 50,  multiplier: 5000 },  { feya: 20,  multiplier: 2000 },
+            { feya: 10,  multiplier: 1000 },  { feya: 5,   multiplier: 500 },
+            { feya: 1,   multiplier: 100 },   { feya: 0.5, multiplier: 50 }
         ];
 
-        let cashData = { 200:0, 100:0, 50:0, 20:0, 10:0, 5:0, 1:0, 0.5:0 };
+        let cashData = {};
+        config.forEach(item => cashData[item.feya] = 0);
         let activeFeya = null;
 
         function init() {
@@ -106,6 +124,8 @@
             });
         }
 
+        function formatNumber(num) { return num.toLocaleString('en-US'); }
+
         function openInput(val) {
             activeFeya = val;
             document.getElementById('modalTitle').innerText = `فئة ${val}`;
@@ -115,20 +135,12 @@
         }
 
         function closeModal() { document.getElementById('inputModal').style.display = 'none'; }
-        function toggleSettings() {
-            const m = document.getElementById('settingsModal');
-            if (m.style.display === 'flex') { m.style.display = 'none'; } 
-            else { m.style.display = 'flex'; showHistory(); }
-        }
-
-        function formatNumber(num) { return num.toLocaleString('en-US'); }
 
         function confirmCount() {
             let count = parseInt(document.getElementById('countInput').value) || 0;
             cashData[activeFeya] = count;
-            let itemConfig = config.find(c => c.feya === activeFeya);
             document.getElementById(`count-${activeFeya}`).innerText = `العدد: ${count}`;
-            document.getElementById(`sum-${activeFeya}`).innerText = formatNumber(count * itemConfig.multiplier);
+            document.getElementById(`sum-${activeFeya}`).innerText = formatNumber(count * config.find(c => c.feya === activeFeya).multiplier);
             updateGrandTotal();
             closeModal();
         }
@@ -140,10 +152,16 @@
             return total;
         }
 
+        function toggleSettings() {
+            const m = document.getElementById('settingsModal');
+            if (m.style.display === 'flex') m.style.display = 'none';
+            else { m.style.display = 'flex'; showHistory(); }
+        }
+
         function clearAll() {
-            let currentTotal = updateGrandTotal();
-            if(currentTotal > 0 && confirm("تصفير وحفظ في السجل؟")) {
-                saveToHistory(currentTotal);
+            let total = updateGrandTotal();
+            if(total > 0 && confirm("حفظ العملية في السجل وتصفير الخانات؟")) {
+                saveFullHistory();
                 config.forEach(item => {
                     cashData[item.feya] = 0;
                     document.getElementById(`count-${item.feya}`).innerText = "العدد: 0";
@@ -153,28 +171,70 @@
             }
         }
 
-        function saveToHistory(amount) {
-            let history = JSON.parse(localStorage.getItem('cashHistory') || '[]');
+        // حفظ الصورة الكاملة للفئات
+        function saveFullHistory() {
+            let history = JSON.parse(localStorage.getItem('fullCashHistory') || '[]');
             const now = new Date();
             const timeStr = `${now.getHours()}:${now.getMinutes().toString().padStart(2,'0')} - ${now.toLocaleDateString('ar-EG')}`;
-            history.unshift({ time: timeStr, total: formatNumber(amount) });
-            localStorage.setItem('cashHistory', JSON.stringify(history.slice(0, 50)));
+            
+            let entry = {
+                id: Date.now(),
+                time: timeStr,
+                total: formatNumber(updateGrandTotal()),
+                details: {...cashData}
+            };
+            
+            history.unshift(entry);
+            localStorage.setItem('fullCashHistory', JSON.stringify(history.slice(0, 50)));
         }
 
         function showHistory() {
             const list = document.getElementById('historyList');
-            const history = JSON.parse(localStorage.getItem('cashHistory') || '[]');
-            list.innerHTML = history.length ? '' : '<p style="color:#666">السجل فارغ</p>';
+            const history = JSON.parse(localStorage.getItem('fullCashHistory') || '[]');
+            list.innerHTML = history.length ? '' : '<p style="color:#666; text-align:center; padding:20px;">السجل فارغ</p>';
             history.forEach(item => {
-                list.innerHTML += `<div class="history-item"><span>${item.time}</span><span style="color:var(--gold)">${item.total}</span></div>`;
+                list.innerHTML += `
+                <div class="history-item" onclick="openReview(${item.id})">
+                    <div>
+                        <div style="font-weight:bold; color:#fff">${item.time}</div>
+                        <div style="font-size:0.7rem; color:var(--gold)">إجمالي: ${item.total}</div>
+                    </div>
+                    <span style="color:#444">◀</span>
+                </div>`;
             });
         }
 
-        function clearHistory() { if(confirm("مسح السجل؟")) { localStorage.removeItem('cashHistory'); showHistory(); } }
+        function openReview(id) {
+            const history = JSON.parse(localStorage.getItem('fullCashHistory') || '[]');
+            const entry = history.find(h => h.id === id);
+            if(!entry) return;
 
+            document.getElementById('reviewDate').innerText = entry.time;
+            document.getElementById('reviewTotal').innerText = entry.total;
+            const container = document.getElementById('reviewContainer');
+            container.innerHTML = "";
+
+            config.forEach(item => {
+                let count = entry.details[item.feya] || 0;
+                let sum = count * item.multiplier;
+                container.innerHTML += `
+                    <div class="cash-row readonly">
+                        <div style="display:flex; align-items:center;">
+                            <div class="feya-btn">${item.feya}</div>
+                            <span class="count-text">العدد: ${count}</span>
+                        </div>
+                        <span class="sum-text">${formatNumber(sum)}</span>
+                    </div>`;
+            });
+            document.getElementById('reviewModal').style.display = 'flex';
+        }
+
+        function closeReview() { document.getElementById('reviewModal').style.display = 'none'; }
+        function clearHistory() { if(confirm("مسح السجل نهائياً؟")) { localStorage.removeItem('fullCashHistory'); showHistory(); } }
+        
         document.getElementById('countInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') confirmCount(); });
 
-        init(); // تشغيل البرنامج فوراً
+        init();
     </script>
 </body>
 </html>
